@@ -98,6 +98,7 @@
 
   .snapshot-note{font-size:12px; color:var(--muted); margin-top:16px;}
   .empty-state{font-size:13.5px; color:var(--muted); border:1px dashed var(--line); border-radius:3px; padding:16px; text-align:center;}
+  .pending-meta-row{display:flex; justify-content:space-between; align-items:flex-start; margin-top:13px; font-size:13.5px;}
 
   .auto-read{margin-top:13px; padding-top:12px; border-top:1px dashed var(--line);}
   .auto-read-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:7px 10px; margin-bottom:7px;}
@@ -164,8 +165,7 @@
       <h2 class="section-title">Open &amp; upcoming</h2>
       <p class="section-sub">Status updates itself off today's date. GMP fields are yours to edit — key in today's number and the est. listing gain recalculates.</p>
       <div class="filter-tabs" id="filterTabs">
-        <button class="filter-tab active" data-filter="all">All</button>
-        <button class="filter-tab" data-filter="Mainboard">Mainboard</button>
+        <button class="filter-tab active" data-filter="Mainboard">Mainboard</button>
         <button class="filter-tab" data-filter="SME">SME</button>
       </div>
       <p class="intro-note">Each card carries an automatic read across 16 factors — GMP, growth, margins, debt, valuation, promoters, subscription and more — worked out from RHP summaries and analyst coverage. It's a snapshot, not a live feed: GMP and subscription can shift a lot in the final day or two, so re-check before bidding.</p>
@@ -179,8 +179,7 @@
       <h2 class="section-title">Pending listing</h2>
       <p class="section-sub">Bidding closed, listing not yet happened — a card moves here on its own once its close date passes, covering both Allotment Awaited and Allotment Out. Track GMP up to listing day, then drop in the actual listing price to see whether the verdict held.</p>
       <div class="filter-tabs" id="filterTabsPending">
-        <button class="filter-tab active" data-filter="all">All</button>
-        <button class="filter-tab" data-filter="Mainboard">Mainboard</button>
+        <button class="filter-tab active" data-filter="Mainboard">Mainboard</button>
         <button class="filter-tab" data-filter="SME">SME</button>
       </div>
       <div id="pendingCards"></div>
@@ -314,7 +313,7 @@ const snapshot = [
 ];
 
 const verdictLabel = {best:"Best IPO", good:"Good IPO", average:"Average IPO", negative:"Weak IPO"};
-let currentFilter = 'all';
+let currentFilter = 'Mainboard';
 
 function fmtDate(d){
   if(!d) return "TBA";
@@ -347,6 +346,17 @@ function autoReadBlock(ipo){
       </div>
       <p class="auto-rationale">${ipo.rationale}</p>
       ${ipo.dataNote ? `<p class="data-note">${ipo.dataNote}</p>` : ''}
+    </div>`;
+}
+
+function autoReadCompact(ipo){
+  if(!ipo.verdict) return '';
+  return `
+    <div class="auto-read">
+      <div class="auto-read-row">
+        <span class="verdict-pill ${ipo.verdict}">${verdictLabel[ipo.verdict]}</span>
+        <span class="hold-note">${ipo.holdLabel}</span>
+      </div>
     </div>`;
 }
 
@@ -406,11 +416,11 @@ function renderCards(){
   const container = document.getElementById('ipoCards');
   const list = ipos
     .map((ipo, i) => ({ipo, i, status: getStatus(ipo)}))
-    .filter(({ipo}) => currentFilter === 'all' || ipo.type === currentFilter)
+    .filter(({ipo}) => ipo.type === currentFilter)
     .filter(({status}) => status.bucket === 'active');
 
   if(list.length === 0){
-    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter === 'all' ? '' : currentFilter + ' '}open or upcoming right now.</div>`;
+    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter} open or upcoming right now.</div>`;
     return;
   }
 
@@ -458,6 +468,7 @@ function renderCards(){
       gainEl.textContent = `≈ ${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% est. listing gain`;
       gainEl.className = 'est-gain ' + (pct > 0 ? 'pos' : 'zero');
     });
+    if(inp.value) inp.dispatchEvent(new Event('input'));
   });
 }
 
@@ -465,16 +476,15 @@ function renderPendingCards(){
   const container = document.getElementById('pendingCards');
   const list = ipos
     .map((ipo, i) => ({ipo, i, status: getStatus(ipo)}))
-    .filter(({ipo}) => currentFilter === 'all' || ipo.type === currentFilter)
+    .filter(({ipo}) => ipo.type === currentFilter)
     .filter(({status}) => status.bucket === 'pending');
 
   if(list.length === 0){
-    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter === 'all' ? '' : currentFilter + ' '}pending listing right now. A card moves here on its own once bidding closes (Allotment Awaited → Allotment Out → Listed).</div>`;
+    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter} pending listing right now. A card moves here on its own once bidding closes (Allotment Awaited → Allotment Out → Listed).</div>`;
     return;
   }
 
   container.innerHTML = list.map(({ipo, i, status}) => {
-    const priceStr = (ipo.low && ipo.high) ? (ipo.low === ipo.high ? `₹${ipo.low}` : `₹${ipo.low}–${ipo.high}`) : '—';
     return `
     <div class="ipo-card">
       <div class="ipo-card-top">
@@ -484,21 +494,18 @@ function renderPendingCards(){
         </div>
         <span class="badge ${status.cls}">${status.label}</span>
       </div>
-      <div class="ipo-grid">
-        <div><span class="field-label">Closed</span><span class="field-val">${fmtDate(ipo.close)}</span></div>
-        <div><span class="field-label">Listing date</span><span class="field-val">${fmtDate(ipo.listing)}</span></div>
-        <div><span class="field-label">Price band</span><span class="field-val">${priceStr}</span></div>
+      <div class="pending-meta-row">
         <div><span class="field-label">Upper band</span><span class="field-val">${ipo.high ? '₹'+ipo.high : '—'}</span></div>
-        ${extraFieldsGrid(ipo)}
-        <div class="gmp-field">
-          <div class="gmp-input-row">
-            <span class="field-label" style="margin-bottom:0;">GMP ₹</span>
-            <input type="number" inputmode="numeric" data-idx="${i}" class="pending-gmp-input" value="${ipo.gmp ?? ''}" placeholder="—">
-          </div>
-          <span class="est-gain zero" id="pending-gain-${i}">—</span>
-        </div>
+        <div><span class="field-label">Listing date</span><span class="field-val">${fmtDate(ipo.listing)}</span></div>
       </div>
-      ${autoReadBlock(ipo)}
+      <div class="gmp-field pending-gmp-field">
+        <div class="gmp-input-row">
+          <span class="field-label" style="margin-bottom:0;">GMP ₹</span>
+          <input type="number" inputmode="numeric" data-idx="${i}" class="pending-gmp-input" value="${ipo.gmp ?? ''}" placeholder="—">
+        </div>
+        <span class="est-gain zero" id="pending-gain-${i}">—</span>
+      </div>
+      ${autoReadCompact(ipo)}
       <div class="listing-check">
         <div class="listing-check-row">
           <span class="listing-check-label"><span class="field-label" style="margin-bottom:0;">Actual listing price ₹</span></span>
@@ -522,9 +529,15 @@ function renderPendingCards(){
       }
       const estPrice = ipo.high + val;
       const pct = (val / ipo.high) * 100;
-      gainEl.textContent = `≈ ₹${estPrice.toFixed(0)} est. listing (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)`;
+      let text = `≈ ₹${estPrice.toFixed(0)} est. listing (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)`;
+      if(ipo.lot){
+        const profit = val * ipo.lot;
+        text += ` · Est. profit/lot ${profit < 0 ? '−' : ''}₹${Math.abs(profit).toLocaleString('en-IN')}`;
+      }
+      gainEl.textContent = text;
       gainEl.className = 'est-gain ' + (pct > 0 ? 'pos' : 'zero');
     });
+    if(inp.value) inp.dispatchEvent(new Event('input'));
   });
 
   container.querySelectorAll('.actual-input').forEach(inp => {
