@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Grey Ledger — IPO Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f0d;
+    --panel: #131914;
+    --panel-2: #182019;
+    --line: #26312a;
+    --text: #ece8dd;
+    --muted: #8c9a8f;
+    --gold: #c9a227;
+    --gold-dim: #7d6a24;
+    --up: #57a06d;
+    --up-bg: #16261b;
+    --down: #c1594a;
+    --down-bg: #271613;
+    --neutral: #b9ac74;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-dim); color:#fff;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+  a{color:var(--gold);}
+
+  header.masthead{ border-bottom:1px solid var(--line); padding:28px 0 18px; }
+  .masthead-inner{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .brand{font-family:'Newsreader', serif; font-weight:600; font-size:30px; letter-spacing:0.2px;}
+  .brand em{font-style:italic; color:var(--gold);}
+  .dateline{font-size:12.5px; color:var(--muted);}
+  .tagline{margin-top:6px; font-size:14.5px; color:var(--muted); max-width:56ch;}
+
+  .ticker-band{ border-bottom:1px solid var(--line); background:var(--panel); overflow:hidden; white-space:nowrap; position:relative; }
+  .ticker-band::before, .ticker-band::after{ content:""; position:absolute; top:0; bottom:0; width:24px; z-index:2; }
+  .ticker-band::before{ left:0; background:linear-gradient(90deg, var(--panel), transparent); }
+  .ticker-band::after{ right:0; background:linear-gradient(270deg, var(--panel), transparent); }
+  .ticker-track{ display:inline-block; padding:10px 0; animation: scroll-left 34s linear infinite; }
+  .ticker-track span{ display:inline-block; padding:0 22px; font-size:13px; font-variant-numeric: tabular-nums; }
+  .ticker-track .name{color:var(--text); font-weight:500; margin-right:6px;}
+  .ticker-track .pct{font-weight:600;}
+  .ticker-track .pct.pos{color:var(--up);}
+  @keyframes scroll-left{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  @media (prefers-reduced-motion: reduce){ .ticker-track{animation:none;} }
+
+  section{padding:34px 0;}
+  section + section{border-top:1px solid var(--line);}
+  h2.section-title{ font-family:'Newsreader', serif; font-weight:600; font-size:22px; margin:0 0 4px; }
+  p.section-sub{color:var(--muted); font-size:14px; margin:0 0 18px; max-width:58ch;}
+
+  .filter-tabs{display:flex; gap:8px; margin-bottom:18px;}
+  .filter-tab{
+    flex:1; text-align:center; padding:9px 10px; font-size:13px; font-weight:600;
+    border:1px solid var(--line); border-radius:2px; background:var(--panel); color:var(--muted);
+    cursor:pointer; font-family:'Inter';
+  }
+  .filter-tab.active{border-color:var(--gold); color:var(--gold); background:#171207;}
+
+  .ipo-card{ background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:16px 16px 14px; margin-bottom:12px; }
+  .ipo-card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .ipo-name{font-family:'Newsreader', serif; font-size:17.5px; font-weight:600; line-height:1.25;}
+  .ipo-type{font-size:12px; color:var(--muted); margin-top:2px;}
+  .badge{ font-size:11px; padding:3px 8px; border-radius:2px; white-space:nowrap; border:1px solid transparent; font-weight:600; }
+  .badge.open{background:var(--up-bg); color:var(--up); border-color:#2c4433;}
+  .badge.upcoming{background:#241f10; color:var(--gold); border-color:#4a3c14;}
+  .badge.closed{background:#1c1c1c; color:var(--muted); border-color:var(--line);}
+  .badge.tba{background:#1c1c1c; color:var(--muted); border-color:var(--line);}
+  .badge.allotment-awaited{background:#2a2210; color:#d9a441; border-color:#4a3c14;}
+  .badge.allotment-out{background:var(--up-bg); color:var(--up); border-color:#2c4433;}
+  .badge.listed{background:var(--up-bg); color:var(--up); border-color:#2c4433;}
+
+  .ipo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; margin-top:14px; font-size:13.5px; }
+  .field-label{color:var(--muted); font-size:11.5px; display:block; margin-bottom:3px;}
+  .field-val{font-variant-numeric: tabular-nums;}
+  .gmp-field{grid-column:span 2; border-top:1px dashed var(--line); padding-top:11px; margin-top:2px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .gmp-input-row{display:flex; align-items:center; gap:8px;}
+  .gmp-input-row input, .listing-check input{
+    width:78px; background:var(--bg); border:1px solid var(--line); color:var(--text);
+    padding:6px 8px; border-radius:2px; font-family:'Inter'; font-size:14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .gmp-input-row input:focus, .listing-check input:focus{outline:1px solid var(--gold); border-color:var(--gold);}
+  .est-gain{font-size:13px; font-weight:600;}
+  .est-gain.pos{color:var(--up);}
+  .est-gain.zero{color:var(--muted);}
+
+  .snapshot-note{font-size:12px; color:var(--muted); margin-top:16px;}
+  .empty-state{font-size:13.5px; color:var(--muted); border:1px dashed var(--line); border-radius:3px; padding:16px; text-align:center;}
+
+  .auto-read{margin-top:13px; padding-top:12px; border-top:1px dashed var(--line);}
+  .auto-read-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:7px 10px; margin-bottom:7px;}
+  .verdict-pill{font-size:11px; font-weight:700; padding:3px 9px; border-radius:2px; white-space:nowrap;}
+  .verdict-pill.best{background:var(--up-bg); color:var(--up);}
+  .verdict-pill.good{background:#182a1c; color:#7ea583;}
+  .verdict-pill.average{background:#241f10; color:var(--neutral);}
+  .verdict-pill.negative{background:var(--down-bg); color:var(--down);}
+  .hold-note{font-size:11.5px; color:var(--muted);}
+  .hold-note b{color:var(--text); font-weight:600;}
+  .auto-rationale{font-size:12.5px; color:var(--muted); line-height:1.55; margin:0;}
+  .data-note{font-size:11px; color:var(--muted); font-style:italic; margin:6px 0 0;}
+  .intro-note{font-size:12.5px; color:var(--muted); line-height:1.6; margin:0 0 18px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:3px;}
+
+  .listing-check{margin-top:13px; padding-top:12px; border-top:1px dashed var(--line);}
+  .listing-check-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .listing-check-label{display:flex; align-items:center; gap:8px;}
+  .prevail-line{font-size:12.5px; color:var(--muted); margin-top:9px; display:none;}
+  .prevail-line.show{display:block;}
+  .prevail-line .verdict-pill{margin-right:6px;}
+
+  .snap-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .snap-row:last-child{border-bottom:none;}
+  .snap-name{font-weight:500;}
+  .snap-right{text-align:right; font-variant-numeric: tabular-nums;}
+  .snap-amt{color:var(--text); font-size:13.5px;}
+  .snap-pct{color:var(--up); font-weight:600; font-size:13.5px;}
+
+  .source-links{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+  .source-link{ display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); border-radius:2px; padding:11px 13px; text-decoration:none; color:var(--text); font-size:13.5px; }
+  .source-link:hover{border-color:var(--gold-dim);}
+  .source-link .go{color:var(--muted); font-size:12px;}
+
+  footer{padding:28px 0 40px; border-top:1px solid var(--line);}
+  .disclaimer{font-size:12px; color:var(--muted); line-height:1.6; max-width:60ch;}
+  .disclaimer strong{color:var(--text);}
+
+  @media (max-width:420px){
+    .brand{font-size:26px;}
+    .ipo-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-inner">
+      <div class="brand">The Grey <em>Ledger</em></div>
+      <div class="dateline" id="todayDate"></div>
+    </div>
+    <div class="tagline">Every open, upcoming and pending-listing Indian IPO, GMP-first — each one comes with an automatic apply/hold read, no manual checklist needed.</div>
+  </div>
+</header>
+
+<div class="ticker-band">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<main>
+
+  <section id="tracker">
+    <div class="wrap">
+      <h2 class="section-title">Open &amp; upcoming</h2>
+      <p class="section-sub">Status updates itself off today's date. GMP fields are yours to edit — key in today's number and the est. listing gain recalculates.</p>
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="Mainboard">Mainboard</button>
+        <button class="filter-tab" data-filter="SME">SME</button>
+      </div>
+      <p class="intro-note">Each card carries an automatic read across 16 factors — GMP, growth, margins, debt, valuation, promoters, subscription and more — worked out from RHP summaries and analyst coverage. It's a snapshot, not a live feed: GMP and subscription can shift a lot in the final day or two, so re-check before bidding.</p>
+      <div id="ipoCards"></div>
+      <p class="snapshot-note">Price bands and dates as tracked on 11–12 Sep 2026. Always cross-check against the exchange bidding page before placing a bid.</p>
+    </div>
+  </section>
+
+  <section id="pending">
+    <div class="wrap">
+      <h2 class="section-title">Pending listing</h2>
+      <p class="section-sub">Bidding closed, listing not yet happened — a card moves here on its own once its close date passes, covering both Allotment Awaited and Allotment Out. Track GMP up to listing day, then drop in the actual listing price to see whether the verdict held.</p>
+      <div class="filter-tabs" id="filterTabsPending">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="Mainboard">Mainboard</button>
+        <button class="filter-tab" data-filter="SME">SME</button>
+      </div>
+      <div id="pendingCards"></div>
+    </div>
+  </section>
+
+  <section id="snapshot">
+    <div class="wrap">
+      <h2 class="section-title">Today's GMP movers</h2>
+      <p class="section-sub">Grey-market pulse on names without firm structured data yet in this ledger — a snapshot from 11 Sep 2026, not a live feed.</p>
+      <div id="snapList"></div>
+    </div>
+  </section>
+
+  <section id="sources">
+    <div class="wrap">
+      <h2 class="section-title">Check today's GMP</h2>
+      <p class="section-sub">Since this page can't fetch these itself, open one of these each morning and drop the number into the field above.</p>
+      <div class="source-links">
+        <a class="source-link" href="https://www.investorgain.in/" target="_blank" rel="noopener"><span>InvestorGain — live GMP, updated every 2 hours</span><span class="go">Open</span></a>
+        <a class="source-link" href="https://www.ipoji.com/ipo-gmp" target="_blank" rel="noopener"><span>IPO Ji — GMP with subscription figures</span><span class="go">Open</span></a>
+        <a class="source-link" href="https://ipogram.in/" target="_blank" rel="noopener"><span>IPOGram — GMP, Kostak &amp; day-wise QIB data</span><span class="go">Open</span></a>
+        <a class="source-link" href="https://ipocentral.in/ipo-discussion/" target="_blank" rel="noopener"><span>IPO Central — GMP, Kostak &amp; Subject to Sauda</span><span class="go">Open</span></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="disclaimer">
+      <strong>GMP is an unofficial, unregulated grey-market indicator</strong> — it reflects sentiment, not a guaranteed listing price, and can move sharply in the final days before listing. Fundamentals, valuation and RHP red flags matter as much as the premium. Nothing on this page is investment advice; read the RHP and check with a SEBI-registered advisor before applying.
+    </p>
+  </div>
+</footer>
+
+<script>
+// ---------- Fallback data: last-known research snapshot (11–12 Sep 2026) ----------
+// Used when ipos.json (fetched from Upstox, see fetch_ipos.py) isn't reachable,
+// and as the source of verdict/rationale/gmp enrichment when it is.
+const researchData = [
+  {name:"Maharaja & Speedex India", type:"SME", open:"2026-09-10", close:"2026-09-15", allotment:"2026-09-16", listing:"2026-09-18", low:177, high:186, gmp:17,
+    verdict:"good", holdLabel:"Listing-gains lean, small hold only",
+    rationale:"Revenue +31%, PAT +176%, ROCE 54.6% and RoNW 80.5% are genuinely strong. But GMP has been inconsistent (₹6–30 across sources this week), Day-1 subscription was soft, and reviewers flag the valuation as already pricey. Good business, not a bargain."},
+  {name:"Om Galaxy", type:"SME", open:"2026-09-10", close:"2026-09-15", allotment:"2026-09-16", listing:"2026-09-18", low:85, high:90, gmp:0,
+    verdict:"average", holdLabel:"Skip, or listing-day only",
+    rationale:"Growth is decelerating — revenue +10%, PAT +5% against last year's pace — and funds split between a new unit and debt repayment. GMP sits at zero with no listed peers to benchmark valuation against. Fine business, unconvincing IPO case right now."},
+  {name:"Vama Wovenfab", type:"SME", open:"2026-09-15", close:"2026-09-17", allotment:"2026-09-18", listing:"2026-09-22", low:324, high:341, gmp:0,
+    verdict:"average", holdLabel:"Speculative hold only, keep it small",
+    rationale:"Revenue nearly tripled (₹78cr→₹215cr) but PAT grew far slower — margins are thin at 5.4% and operating leverage hasn't kicked in. ROCE 32% and D/E 0.89x are healthy. GMP flat at ₹0 despite the growth headline is the one that gives pause."},
+  {name:"Quanto Agroworld", type:"SME", open:"2026-09-15", close:"2026-09-17", allotment:"2026-09-18", listing:"2026-09-22", low:67, high:67, gmp:0,
+    verdict:"good", holdLabel:"Worth holding if you can stomach SME illiquidity",
+    rationale:"The strongest fundamentals of this week's batch: revenue +145%, PAT margin 20.8%, D/E just 0.16, P/E ~14x. GMP hasn't caught up yet (₹0), likely because it's a niche single-crop (lemongrass) business — that's the real risk to watch, not the numbers."},
+  {name:"Shakti Polytarp", type:"SME", open:"2026-09-15", close:"2026-09-17", allotment:"2026-09-18", listing:"2026-09-22", low:null, high:null, gmp:0,
+    verdict:"average", holdLabel:"No — leverage argues against holding",
+    rationale:"Cheap on paper (P/E ~10x) with real revenue growth, but a debt-to-equity ratio of 2.6x and rising borrowings are the highest leverage in this batch. GMP at zero. The valuation is attractive only if the balance sheet improves post-listing."},
+  {name:"Jindal Supreme (India)", type:"Mainboard", open:"2026-09-16", close:"2026-09-18", allotment:"2026-09-19", listing:"2026-09-23", low:88, high:93, gmp:20,
+    verdict:"good", holdLabel:"Listing-gains lean, small hold if margins keep improving",
+    rationale:"50-year manufacturer using 80% of fresh proceeds to cut existing debt (already down from ₹120cr to ₹92cr) — a genuinely good use of funds. But FY26 PAT dipped 7% on a commodity-exposed, cyclical business. GMP is positive and building (₹17–21) ahead of the Sep 16 open."},
+
+  {name:"Pranav Constructions", type:"Mainboard", open:"2026-09-07", close:"2026-09-09", allotment:"2026-09-10", listing:"2026-09-15", low:118, high:124, gmp:45, lot:120, subs:"126.34x", issueSize:"₹351.03 Cr", minAmount:"₹14,880",
+    verdict:"good", holdLabel:"Listing-gains lean, small hold if pipeline executes",
+    rationale:"Revenue +20%, PAT +15%, RoNW 33.8%, P/E ~20x — reasonable for a Mumbai redevelopment specialist with an integrated in-house model. 126x oversubscription and a steady ~36% GMP show real demand. Real estate is project-and-cycle dependent, so treat this as a listing-gains case first."},
+  {name:"Kanohar Electricals", type:"Mainboard", open:"2026-09-08", close:"2026-09-10", allotment:"2026-09-11", listing:"2026-09-16", low:601, high:632, gmp:225, lot:23, subs:"90.59x", issueSize:"₹1,055.74 Cr", minAmount:"₹14,536",
+    verdict:"good", holdLabel:"Listing-gains lean, small hold if order book converts",
+    rationale:"Revenue +45%, PAT nearly doubled, EBITDA margin 27.6% — a genuinely strong transformer business with a ₹1,818cr order book. But P/E is ~39x and roughly 72% of the issue is OFS, so most proceeds aren't funding the business. GMP is the strongest in this whole batch (36%)."},
+  {name:"Prasol Chemicals", type:"Mainboard", open:"2026-09-08", close:"2026-09-10", allotment:"2026-09-11", listing:"2026-09-16", low:643, high:676, gmp:0, lot:22, subs:"3.47x", issueSize:"₹500 Cr", minAmount:"₹14,872",
+    verdict:"negative", holdLabel:"No — skip, or listing-day only",
+    rationale:"PAT +91% and a D/E of just 0.19x look great on paper, but at ~47x P/E with 84% of the issue as OFS, institutions aren't buying it — QIB demand came in near zero and GMP has gone flat-to-negative. When institutions no-show a profitable chemicals IPO like this, that's worth respecting."},
+  {name:"Glass Wall Systems (India)", type:"Mainboard", open:"2026-09-08", close:"2026-09-10", allotment:"2026-09-11", listing:"2026-09-16", low:172, high:182, gmp:45, lot:82, subs:"81.65x", issueSize:"₹427.89 Cr", minAmount:"₹14,924",
+    verdict:"good", holdLabel:"Listing-gains lean, small hold if order book converts",
+    rationale:"Revenue +64%, PAT +46%, and a ₹982cr order book spanning India, the US and Australia — real momentum. But only ₹60cr of the ₹428cr raise is fresh capital; the rest is promoters selling down. GMP has held around 25% through the week."},
+  {name:"LCC Projects", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:139, high:146, gmp:64, lot:102, subs:"49.57x", issueSize:"₹427.14 Cr", minAmount:"₹14,892",
+    verdict:"good", holdLabel:"Listing-gains lean — verify fundamentals yourself",
+    rationale:"The technical signal is strong — 49.6x subscription and the highest GMP percentage in this batch (~42%). I couldn't pull detailed FY financials for this one from public sources, so this read leans more on GMP and subscription than fundamentals — worth a quick RHP check before sizing up.",
+    dataNote:"Limited fundamental data available — read leans on GMP/subscription."},
+  {name:"Karamtara Engineering", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:241, high:254, gmp:61, lot:59, subs:"66.01x", issueSize:"₹875 Cr", minAmount:"₹14,986",
+    verdict:"good", holdLabel:"Listing-gains lean, small hold if anchor conviction proves out",
+    rationale:"₹262cr anchor book with HDFC Mutual Fund among the buyers is a real institutional signal, backed by 66x subscription and a steady ~25% GMP. Deep FY financials weren't available for this one — worth a quick RHP check on margins and debt before committing size.",
+    dataNote:"Limited fundamental data available — read leans on anchor quality and subscription."},
+  {name:"Rentomojo", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:384, high:404, gmp:140, lot:37, subs:"72.88x", issueSize:"₹1,255.57 Cr", minAmount:"₹14,948",
+    verdict:"average", holdLabel:"Speculative — listing-gains lean only",
+    rationale:"Revenue +45%, PAT +142%, RoNW 43.5% are impressive, but it's priced at ~39x P/E and 14x P/B with no listed peers to sanity-check that against, and 88% of the raise is OFS. Occupancy has slipped (86%→83%) even as revenue grew, with ₹122cr of accumulated losses still on the books. GMP is strong (35%), but fundamentals argue for more caution than the grey market suggests."},
+  {name:"Asset Reconstruction Company (India)", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:132, high:139, gmp:14, lot:107, subs:"20.10x", issueSize:"₹732.97 Cr", minAmount:"₹14,873",
+    verdict:"average", holdLabel:"Measured hold possible if you understand the sector",
+    rationale:"Cheap at ~11x P/E and 1.47x P/B with an 11.7% RoA — India's first ARC, backed by SBI. But this is a 100% OFS (the company gets zero proceeds) and borrowings jumped from ₹306cr to ₹1,206cr in FY26, which is the number to watch. GMP is modest (10%), consistent with a financial-services IPO rather than a hype play."},
+  {name:"Steamhouse India", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:77, high:81, gmp:20, lot:185, subs:"32.07x", issueSize:"₹414 Cr", minAmount:"₹14,985",
+    verdict:"average", holdLabel:"No strong case either way — listing-day call only",
+    rationale:"Revenue of ₹491.5cr and PAT of ₹38.6cr show a profitable, working business — but its pipeline-based supply model means growth depends entirely on finding new land near industrial clusters, a real structural ceiling on scale. GMP is modest at 25%, in line with that constraint."},
+  {name:"Manipal Payment & Identity Solutions", type:"Mainboard", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-15", listing:"2026-09-17", low:322, high:339, gmp:1, lot:44, subs:"1.42x", issueSize:"₹805 Cr", minAmount:"₹14,916",
+    verdict:"negative", holdLabel:"No — skip, or listing-day exit only",
+    rationale:"Revenue is barely growing (+5.6%) and PAT actually fell 10.2% in FY26 — the wrong direction for an IPO pitch. Subscription came in at just 1.42x, the weakest of this entire batch by a wide margin, and GMP has stayed thin (0–10%) all week despite a ₹362cr anchor book. The card-manufacturing market position is real, but the numbers behind this listing are the weakest here."},
+
+  {name:"Apana Logistics", type:"SME", open:"2026-09-07", close:"2026-09-09", allotment:"2026-09-11", listing:"2026-09-15", low:60, high:60, gmp:3, lot:2000, subs:"1.31x", issueSize:"₹34.14 Cr", minAmount:"₹1,20,000",
+    verdict:"negative", holdLabel:"No — weak signal all around",
+    rationale:"Subscription at just 1.31x and a thin ~5% GMP don't show real demand.",
+    dataNote:"Limited fundamental data available — read is technical-signal only."},
+  {name:"Vinod Texworld", type:"SME", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-13", listing:"2026-09-16", low:94, high:94, gmp:18, lot:1200, subs:"1.66x", issueSize:"₹42.83 Cr", minAmount:"₹1,12,800",
+    verdict:"average", holdLabel:"Speculative small allocation only",
+    rationale:"Modest subscription (1.66x) and a mid-teens GMP (~19%) — not weak, not strong.",
+    dataNote:"Limited fundamental data available — read is technical-signal only."},
+  {name:"Infrax Renewable", type:"SME", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-13", listing:"2026-09-16", low:104, high:104, gmp:0, lot:1200, subs:"2.10x", issueSize:"₹40.88 Cr", minAmount:"₹1,24,800",
+    verdict:"negative", holdLabel:"No — GMP has gone flat despite the renewables theme",
+    rationale:"Subscription of 2.1x is unremarkable and GMP has flattened to near zero — the renewable-energy label alone isn't pulling grey-market demand here.",
+    dataNote:"Limited fundamental data available — read is technical-signal only."},
+  {name:"Amtech Esters", type:"SME", open:"2026-09-09", close:"2026-09-11", allotment:"2026-09-13", listing:"2026-09-16", low:71, high:75, gmp:11, lot:1600, subs:"25.78x", issueSize:"₹17.88 Cr", minAmount:"₹1,20,000",
+    verdict:"good", holdLabel:"Listing-gains lean — small, tightly-sized issue",
+    rationale:"25.8x subscription against a tiny ₹17.9cr issue is a real demand signal, and GMP is positive (~15%). Small-issue SME names can be thin on liquidity post-listing even when pre-listing demand is strong.",
+    dataNote:"Limited fundamental data available — read is technical-signal only."},
+
+  {name:"SS Retail", type:"Mainboard", open:"2026-09-16", close:"2026-09-18", allotment:"2026-09-21", listing:"2026-09-23", low:403, high:424, gmp:16, lot:35, issueSize:"₹500.75 Cr", minAmount:"₹14,840",
+    verdict:"average", holdLabel:"No strong conviction — listing-day call only if GMP holds",
+    rationale:"503 stores across 215 cities is real scale, and 72% of the raise is fresh capital funding fit-outs and working capital — a decent mix. But the post-issue P/E is a rich ~53x, PAT margin is thin, and borrowings have been rising. GMP has been modest and inconsistent across sources (₹16–30). Selective-apply territory, not a clear buy."},
+  {name:"Veegaland Developers", type:"Mainboard", open:"2026-09-10", close:"2026-09-15", allotment:"2026-09-16", listing:"2026-09-18", low:130, high:140, gmp:18, lot:107, subs:"0.69x", issueSize:"₹210 Cr", minAmount:"₹14,980",
+    verdict:"good", holdLabel:"Worth holding — growth funded entirely by fresh capital",
+    rationale:"100% fresh issue — every rupee funds the business, not an exit. Revenue +71%, PAT +160%, RoNW 16%, and ICRA ranks it Kerala's fastest-selling residential developer. P/E of ~26x is reasonable against that growth. GMP has been inconsistent (₹10–30 across sources) and early subscription looked soft, so treat as a measured entry rather than a hype chase.",
+    dataNote:"Traded under the Veegaland Homes brand name — same company."},
+  {name:"Manika Plastech", type:"Mainboard", open:"2026-09-11", close:"2026-09-16", allotment:"2026-09-17", listing:"2026-09-21", low:40, high:43, gmp:13, lot:348, issueSize:"₹125.50 Cr", minAmount:"₹14,964",
+    verdict:"good", holdLabel:"Worth holding — cheap valuation with EV-adjacent exposure",
+    rationale:"Post-issue P/E of just ~9.6x is genuinely cheap, and over half of revenue comes from battery casings — real exposure to the energy-storage growth theme. Revenue growth is modest (+6%) though PAT grew faster (+16%), and 26% of the issue is OFS (a trust exiting), within a reasonable range. GMP has been running strong at roughly 30% of the issue price — one of the better-received names in this batch."},
+];
+
+// Live-fetched data (from ipos.json) merges into this at load time; falls
+// back to researchData untouched if the fetch doesn't succeed.
+let ipos = researchData;
+
+// ---------- Data: GMP snapshot without structured data in this ledger ----------
+const snapshot = [
+  {name:"National Stock Exchange of India", amt:"₹235", pct:"IQ 62 · eyeing ~21 Sep listing"},
+];
+
+const verdictLabel = {best:"Best IPO", good:"Good IPO", average:"Average IPO", negative:"Weak IPO"};
+let currentFilter = 'all';
+
+function fmtDate(d){
+  if(!d) return "TBA";
+  const dt = new Date(d + "T00:00:00");
+  return dt.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+}
+
+function getStatus(ipo){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const {open, close, allotment, listing} = ipo;
+  if(!open) return {label:"Dates TBA", cls:"tba", bucket:"active"};
+  const o = new Date(open + "T00:00:00");
+  if(today < o) return {label:"Upcoming", cls:"upcoming", bucket:"active"};
+  const c = close ? new Date(close + "T00:00:00") : null;
+  if(!c || today <= c) return {label:"Open", cls:"open", bucket:"active"};
+  const l = listing ? new Date(listing + "T00:00:00") : null;
+  if(l && today >= l) return {label:"Listed", cls:"listed", bucket:"pending"};
+  const a = allotment ? new Date(allotment + "T00:00:00") : null;
+  if(a && today >= a) return {label:"Allotment Out", cls:"allotment-out", bucket:"pending"};
+  return {label:"Allotment Awaited", cls:"allotment-awaited", bucket:"pending"};
+}
+
+function autoReadBlock(ipo){
+  if(!ipo.verdict) return '';
+  return `
+    <div class="auto-read">
+      <div class="auto-read-row">
+        <span class="verdict-pill ${ipo.verdict}">${verdictLabel[ipo.verdict]}</span>
+        <span class="hold-note">Hold post-listing: <b>${ipo.holdLabel}</b></span>
+      </div>
+      <p class="auto-rationale">${ipo.rationale}</p>
+      ${ipo.dataNote ? `<p class="data-note">${ipo.dataNote}</p>` : ''}
+    </div>`;
+}
+
+function extraFieldsGrid(ipo){
+  return `
+        <div><span class="field-label">Lot size</span><span class="field-val">${ipo.lot ?? '—'}</span></div>
+        <div><span class="field-label">Subscription</span><span class="field-val">${ipo.subs ?? '—'}</span></div>
+        <div><span class="field-label">Issue size</span><span class="field-val">${ipo.issueSize ?? '—'}</span></div>
+        <div><span class="field-label">Min. amount</span><span class="field-val">${ipo.minAmount ?? '—'}</span></div>`;
+}
+
+function normalizeName(name){
+  return (name || '').toLowerCase().replace(/\bipo\b|\blimited\b|\bltd\.?\b|\(india\)|[^a-z0-9]+/g, '');
+}
+
+async function loadLiveData(){
+  try{
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('ipos.json', {signal: controller.signal, cache: 'no-store'});
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error('ipos.json not reachable (' + res.status + ')');
+    const live = await res.json();
+    if(!Array.isArray(live) || live.length === 0) throw new Error('ipos.json empty');
+
+    const merged = live.map(rec => {
+      const match = researchData.find(r => normalizeName(r.name) === normalizeName(rec.name));
+      return match ? {...rec, verdict: match.verdict, holdLabel: match.holdLabel, rationale: match.rationale, dataNote: match.dataNote, gmp: (rec.gmp ?? match.gmp)} : rec;
+    });
+    researchData.forEach(r => {
+      if(!live.some(rec => normalizeName(rec.name) === normalizeName(r.name))) merged.push(r);
+    });
+    ipos = merged;
+  } catch(err){
+    console.info('Live IPO data unavailable this load — using the last-known snapshot instead.', err.message);
+    ipos = researchData;
+  }
+}
+
+function prevailCheck(verdict, gainPct){
+  if(verdict === 'best' || verdict === 'good'){
+    if(gainPct > 5) return {cls:'best', text:"Verdict held — listed with a real premium, as expected."};
+    if(gainPct >= 0) return {cls:'average', text:"Listed roughly flat — weaker than the read, but not wrong."};
+    return {cls:'negative', text:"Verdict didn't hold — it listed below issue price despite the Good/Best read."};
+  }
+  if(verdict === 'average'){
+    if(gainPct > 10) return {cls:'best', text:"Beat the cautious read — listed with a solid premium."};
+    if(gainPct >= -5) return {cls:'average', text:"Landed about where the cautious read expected."};
+    return {cls:'negative', text:"Fell further than the cautious read expected."};
+  }
+  return gainPct <= 0
+    ? {cls:'best', text:"Verdict held — listed flat or below issue price, as expected."}
+    : {cls:'negative', text:"Verdict didn't hold — it listed with a premium despite the weak read."};
+}
+
+function renderCards(){
+  const container = document.getElementById('ipoCards');
+  const list = ipos
+    .map((ipo, i) => ({ipo, i, status: getStatus(ipo)}))
+    .filter(({ipo}) => currentFilter === 'all' || ipo.type === currentFilter)
+    .filter(({status}) => status.bucket === 'active');
+
+  if(list.length === 0){
+    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter === 'all' ? '' : currentFilter + ' '}open or upcoming right now.</div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(({ipo, i, status}) => {
+    const priceStr = (ipo.low && ipo.high) ? (ipo.low === ipo.high ? `₹${ipo.low}` : `₹${ipo.low}–${ipo.high}`) : '—';
+    return `
+    <div class="ipo-card">
+      <div class="ipo-card-top">
+        <div>
+          <div class="ipo-name">${ipo.name}</div>
+          <div class="ipo-type">${ipo.type}</div>
+        </div>
+        <span class="badge ${status.cls}">${status.label}</span>
+      </div>
+      <div class="ipo-grid">
+        <div><span class="field-label">Opens</span><span class="field-val">${fmtDate(ipo.open)}</span></div>
+        <div><span class="field-label">Closes</span><span class="field-val">${fmtDate(ipo.close)}</span></div>
+        <div><span class="field-label">Price band</span><span class="field-val">${priceStr}</span></div>
+        <div><span class="field-label">Upper band</span><span class="field-val">${ipo.high ? '₹'+ipo.high : '—'}</span></div>
+        ${extraFieldsGrid(ipo)}
+        <div class="gmp-field">
+          <div class="gmp-input-row">
+            <span class="field-label" style="margin-bottom:0;">GMP ₹</span>
+            <input type="number" inputmode="numeric" data-idx="${i}" class="gmp-input" value="${ipo.gmp ?? ''}" placeholder="—">
+          </div>
+          <span class="est-gain zero" id="gain-${i}">—</span>
+        </div>
+      </div>
+      ${autoReadBlock(ipo)}
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.gmp-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const idx = e.target.dataset.idx;
+      const ipo = ipos[idx];
+      const val = parseFloat(e.target.value);
+      const gainEl = document.getElementById('gain-' + idx);
+      if(isNaN(val) || !ipo.high){
+        gainEl.textContent = '—';
+        gainEl.className = 'est-gain zero';
+        return;
+      }
+      const pct = (val / ipo.high) * 100;
+      gainEl.textContent = `≈ ${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% est. listing gain`;
+      gainEl.className = 'est-gain ' + (pct > 0 ? 'pos' : 'zero');
+    });
+  });
+}
+
+function renderPendingCards(){
+  const container = document.getElementById('pendingCards');
+  const list = ipos
+    .map((ipo, i) => ({ipo, i, status: getStatus(ipo)}))
+    .filter(({ipo}) => currentFilter === 'all' || ipo.type === currentFilter)
+    .filter(({status}) => status.bucket === 'pending');
+
+  if(list.length === 0){
+    container.innerHTML = `<div class="empty-state">Nothing ${currentFilter === 'all' ? '' : currentFilter + ' '}pending listing right now. A card moves here on its own once bidding closes (Allotment Awaited → Allotment Out → Listed).</div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(({ipo, i, status}) => {
+    const priceStr = (ipo.low && ipo.high) ? (ipo.low === ipo.high ? `₹${ipo.low}` : `₹${ipo.low}–${ipo.high}`) : '—';
+    return `
+    <div class="ipo-card">
+      <div class="ipo-card-top">
+        <div>
+          <div class="ipo-name">${ipo.name}</div>
+          <div class="ipo-type">${ipo.type}</div>
+        </div>
+        <span class="badge ${status.cls}">${status.label}</span>
+      </div>
+      <div class="ipo-grid">
+        <div><span class="field-label">Closed</span><span class="field-val">${fmtDate(ipo.close)}</span></div>
+        <div><span class="field-label">Listing date</span><span class="field-val">${fmtDate(ipo.listing)}</span></div>
+        <div><span class="field-label">Price band</span><span class="field-val">${priceStr}</span></div>
+        <div><span class="field-label">Upper band</span><span class="field-val">${ipo.high ? '₹'+ipo.high : '—'}</span></div>
+        ${extraFieldsGrid(ipo)}
+        <div class="gmp-field">
+          <div class="gmp-input-row">
+            <span class="field-label" style="margin-bottom:0;">GMP ₹</span>
+            <input type="number" inputmode="numeric" data-idx="${i}" class="pending-gmp-input" value="${ipo.gmp ?? ''}" placeholder="—">
+          </div>
+          <span class="est-gain zero" id="pending-gain-${i}">—</span>
+        </div>
+      </div>
+      ${autoReadBlock(ipo)}
+      <div class="listing-check">
+        <div class="listing-check-row">
+          <span class="listing-check-label"><span class="field-label" style="margin-bottom:0;">Actual listing price ₹</span></span>
+          <input type="number" inputmode="numeric" data-idx="${i}" class="actual-input" placeholder="once known" value="${ipo.listingPrice ?? ''}">
+        </div>
+        <div class="prevail-line" id="prevail-${i}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.pending-gmp-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const idx = e.target.dataset.idx;
+      const ipo = ipos[idx];
+      const val = parseFloat(e.target.value);
+      const gainEl = document.getElementById('pending-gain-' + idx);
+      if(isNaN(val) || !ipo.high){
+        gainEl.textContent = '—';
+        gainEl.className = 'est-gain zero';
+        return;
+      }
+      const estPrice = ipo.high + val;
+      const pct = (val / ipo.high) * 100;
+      gainEl.textContent = `≈ ₹${estPrice.toFixed(0)} est. listing (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)`;
+      gainEl.className = 'est-gain ' + (pct > 0 ? 'pos' : 'zero');
+    });
+  });
+
+  container.querySelectorAll('.actual-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const idx = e.target.dataset.idx;
+      const ipo = ipos[idx];
+      const val = parseFloat(e.target.value);
+      const lineEl = document.getElementById('prevail-' + idx);
+      if(isNaN(val) || !ipo.high){
+        lineEl.classList.remove('show');
+        return;
+      }
+      const pct = ((val - ipo.high) / ipo.high) * 100;
+      const pctTag = `<span class="verdict-pill ${pct > 0 ? 'best' : (pct < 0 ? 'negative' : 'average')}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>`;
+      if(ipo.verdict){
+        const check = prevailCheck(ipo.verdict, pct);
+        lineEl.innerHTML = `<span class="verdict-pill ${check.cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</span>${check.text}`;
+      } else {
+        lineEl.innerHTML = `${pctTag}Listed at ₹${val} against a ₹${ipo.high} issue price. No researched verdict on this one yet to check against.`;
+      }
+      lineEl.classList.add('show');
+    });
+    if(inp.value) inp.dispatchEvent(new Event('input'));
+  });
+}
+
+function renderSnapshot(){
+  const el = document.getElementById('snapList');
+  el.innerHTML = snapshot.map(s => `
+    <div class="snap-row">
+      <span class="snap-name">${s.name}</span>
+      <span class="snap-right"><span class="snap-amt">${s.amt}</span><br><span class="snap-pct">${s.pct}</span></span>
+    </div>
+  `).join('');
+}
+
+function renderTicker(){
+  const items = snapshot.map(s => `<span><span class="name">${s.name}</span><span class="pct pos">${s.pct}</span></span>`).join('');
+  document.getElementById('tickerTrack').innerHTML = items + items;
+}
+
+function renderDate(){
+  const el = document.getElementById('todayDate');
+  el.textContent = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+
+function setupFilterTabs(){
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentFilter = tab.dataset.filter;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === currentFilter));
+      renderCards();
+      renderPendingCards();
+    });
+  });
+}
+
+renderDate();
+renderCards();
+renderPendingCards();
+renderSnapshot();
+renderTicker();
+setupFilterTabs();
+
+// Live data is a background upgrade, never a blocker — the page above has
+// already rendered from researchData by the time this resolves (or doesn't).
+loadLiveData().then(() => {
+  renderCards();
+  renderPendingCards();
+}).catch(err => {
+  console.info('Live data unavailable, keeping the built-in snapshot.', err);
+});
+</script>
+
+</body>
+</html>
