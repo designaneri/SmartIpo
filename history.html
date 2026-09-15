@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Record — GMP Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f0d; --panel: #131914; --panel-2: #182019; --line: #26312a;
+    --text: #ece8dd; --muted: #8c9a8f; --gold: #c9a227; --gold-dim: #7d6a24;
+    --up: #57a06d; --up-bg: #16261b; --down: #c1594a; --down-bg: #271613; --neutral: #b9ac74;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+  a{color:var(--gold);}
+
+  header.masthead{ border-bottom:1px solid var(--line); padding:28px 0 18px; }
+  .masthead-inner{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .brand{font-family:'Newsreader', serif; font-weight:600; font-size:30px;}
+  .brand em{font-style:italic; color:var(--gold);}
+  .back-link{font-size:13px; color:var(--muted); text-decoration:none;}
+  .back-link:hover{color:var(--gold);}
+  .tagline{margin-top:6px; font-size:14.5px; color:var(--muted); max-width:56ch;}
+
+  section{padding:30px 0;}
+  section + section{border-top:1px solid var(--line);}
+  h2.section-title{ font-family:'Newsreader', serif; font-weight:600; font-size:22px; margin:0 0 4px; }
+  p.section-sub{color:var(--muted); font-size:14px; margin:0 0 18px; max-width:60ch;}
+
+  .method-note{font-size:12.5px; color:var(--muted); line-height:1.6; margin:0 0 20px; padding:13px 14px; background:var(--panel); border:1px solid var(--line); border-radius:3px;}
+  .method-note strong{color:var(--text);}
+
+  .stat-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px;}
+  .stat-box{background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:14px;}
+  .stat-num{font-family:'Newsreader', serif; font-size:26px; font-weight:600;}
+  .stat-num.up{color:var(--up);}
+  .stat-label{font-size:11.5px; color:var(--muted); margin-top:2px;}
+
+  .month-tabs{display:flex; gap:8px; margin-bottom:18px;}
+  .month-tab{ flex:1; text-align:center; padding:9px 10px; font-size:13px; font-weight:600; border:1px solid var(--line); border-radius:2px; background:var(--panel); color:var(--muted); cursor:pointer; font-family:'Inter'; }
+  .month-tab.active{border-color:var(--gold); color:var(--gold); background:#171207;}
+
+  .row-card{ background:var(--panel); border:1px solid var(--line); border-radius:3px; padding:14px 16px; margin-bottom:10px; }
+  .row-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .row-name{font-family:'Newsreader', serif; font-size:16px; font-weight:600; line-height:1.25;}
+  .row-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 12px; margin-top:11px; font-size:13px;}
+  .field-label{color:var(--muted); font-size:11px; display:block; margin-bottom:2px;}
+  .field-val{font-variant-numeric: tabular-nums;}
+  .field-val.pos{color:var(--up);}
+  .field-val.neg{color:var(--down);}
+  .row-verdict{margin-top:11px; padding-top:11px; border-top:1px dashed var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
+  .pill{font-size:11px; font-weight:700; padding:3px 9px; border-radius:2px; white-space:nowrap;}
+  .pill.best{background:var(--up-bg); color:var(--up);}
+  .pill.good{background:#182a1c; color:#7ea583;}
+  .pill.average{background:#241f10; color:var(--neutral);}
+  .pill.negative{background:var(--down-bg); color:var(--down);}
+  .held-tag{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+
+  footer{padding:24px 0 40px; border-top:1px solid var(--line);}
+  .disclaimer{font-size:12px; color:var(--muted); line-height:1.6; max-width:60ch;}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-inner">
+      <div class="brand">GMP <em>Radar</em></div>
+      <a class="back-link" href="index.html">← Back to tracker</a>
+    </div>
+    <div class="tagline">Every IPO that's listed, its GMP going in, and what our GMP-tier call would have said — checked against what actually happened.</div>
+  </div>
+</header>
+
+<main>
+  <section id="method">
+    <div class="wrap">
+      <h2 class="section-title">Track record</h2>
+      <p class="section-sub">Real listing data, not cherry-picked — the wins and the misses both stay on the page.</p>
+      <p class="method-note">
+        <strong>How the historical call is worked out:</strong> going forward, a new IPO gets the full 16-factor read (financials, valuation, debt, promoters, and more). For IPOs that already listed, that kind of research isn't practical to redo after the fact for every name — so this page applies just the <strong>GMP-tier rule</strong> consistently: GMP ≥20% of issue price → Best, 10–20% → Good, 0–10% → Average, negative → Weak. "Held" checks whether the actual listing outcome matched what that tier would predict. Source: closing GMP and listing-day prices as reported by MrMoneyFrugal's monthly GMP-vs-listing studies, cross-checked against issue price.
+      </p>
+      <div class="stat-row" id="statRow"></div>
+      <div class="month-tabs" id="monthTabs"></div>
+      <div id="historyList"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="disclaimer">
+      GMP is an unofficial, unregulated indicator. Past accuracy of the GMP-tier rule is not a guarantee of future results — it's shown here so the logic behind this site's calls can be checked against reality, not taken on faith.
+    </p>
+  </div>
+</footer>
+
+<script>
+// ---------- Real listing data: August 2026 (39 of 40 IPOs — one dropped for incomplete listing data) ----------
+// Source: MrMoneyFrugal "GMP vs Listing Gains August 2026" monthly study.
+const august2026 = [
+  {name:"Advance Technoforge", issue:95, gmp:4, gmpPct:4.21, listed:94.00, gainPct:-1.05},
+  {name:"Propshop Events and Exhibitions", issue:69, gmp:0, gmpPct:0, listed:55.20, gainPct:-20.00},
+  {name:"Poojaa Precision Engg", issue:301, gmp:200, gmpPct:66.45, listed:470.00, gainPct:56.15},
+  {name:"Fusion Klassroom Edutech", issue:159, gmp:0, gmpPct:0, listed:170.00, gainPct:6.92},
+  {name:"Manipal Health Enterprises", issue:590, gmp:7, gmpPct:1.19, listed:652.00, gainPct:10.51},
+  {name:"Dhaval Packaging", issue:97, gmp:12, gmpPct:12.37, listed:110.00, gainPct:13.40},
+  {name:"MV Electrosystems", issue:425, gmp:109, gmpPct:25.65, listed:520.00, gainPct:22.35},
+  {name:"H. R. Hygiene", issue:88, gmp:1, gmpPct:1.14, listed:90.00, gainPct:2.27},
+  {name:"Juniper Green Energy", issue:225, gmp:23, gmpPct:10.22, listed:245.00, gainPct:8.89},
+  {name:"G.V. Electricals", issue:130, gmp:25, gmpPct:19.23, listed:158.00, gainPct:21.54},
+  {name:"Oneindig Technologies", issue:96, gmp:7, gmpPct:7.29, listed:120.00, gainPct:25.00},
+  {name:"Ardee Industries", issue:53, gmp:17, gmpPct:32.08, listed:72.00, gainPct:35.85},
+  {name:"Anawil Wire & Engineering", issue:270, gmp:58, gmpPct:21.48, listed:329.65, gainPct:22.09},
+  {name:"Aegeus Technologies", issue:105, gmp:12, gmpPct:11.43, listed:124.50, gainPct:18.57},
+  {name:"LAPL Automotive", issue:94, gmp:50, gmpPct:53.19, listed:135.00, gainPct:43.62},
+  {name:"LEAP India", issue:159, gmp:13, gmpPct:8.18, listed:165.90, gainPct:4.34},
+  {name:"Technocraft Ventures", issue:212, gmp:42, gmpPct:19.81, listed:284.00, gainPct:33.96},
+  {name:"Dhoot Transmission", issue:871, gmp:262, gmpPct:30.08, listed:1200.00, gainPct:37.77},
+  {name:"Optimystix Entertainment India", issue:175, gmp:0, gmpPct:0, listed:180.00, gainPct:2.86},
+  {name:"Molbio Diagnostics", issue:807, gmp:116, gmpPct:14.37, listed:980.00, gainPct:21.44},
+  {name:"Pramodini Medicare", issue:118, gmp:0, gmpPct:0, listed:120.00, gainPct:1.69},
+  {name:"Milky Mist Dairy Food", issue:140, gmp:20, gmpPct:14.29, listed:165.00, gainPct:17.86},
+  {name:"Shiprocket", issue:97, gmp:35, gmpPct:36.08, listed:131.00, gainPct:35.05},
+  {name:"Fascinate Textiles", issue:151, gmp:0, gmpPct:0, listed:120.80, gainPct:-20.00},
+  {name:"Behari Lal Engineering", issue:285, gmp:133, gmpPct:46.67, listed:465.00, gainPct:63.16},
+  {name:"Q&T Foods", issue:115, gmp:1, gmpPct:0.87, listed:115.00, gainPct:0.00},
+  {name:"Sham Foam", issue:130, gmp:1.5, gmpPct:1.15, listed:104.00, gainPct:-20.00},
+  {name:"Credent Connect N Care", issue:189, gmp:92, gmpPct:48.68, listed:359.10, gainPct:90.00},
+  {name:"ENS Enterprises", issue:92, gmp:5, gmpPct:5.43, listed:96.00, gainPct:4.35},
+  {name:"Skytech Infinite Platform", issue:77, gmp:1, gmpPct:1.30, listed:74.00, gainPct:-3.90},
+  {name:"Sunshine Pictures", issue:360, gmp:50, gmpPct:13.89, listed:395.90, gainPct:9.97},
+  {name:"Technocrats Plasma Systems", issue:132, gmp:70, gmpPct:53.03, listed:230.00, gainPct:74.24},
+  {name:"Lalithaa Jewellery Mart", issue:201, gmp:74, gmpPct:36.82, listed:265.00, gainPct:31.84},
+  {name:"Shankesh Jewellers", issue:93, gmp:3, gmpPct:3.23, listed:103.30, gainPct:11.08},
+  {name:"Horizon Industrial Parks", issue:60, gmp:2, gmpPct:3.33, listed:60.25, gainPct:0.42},
+  {name:"Gaja Alternative Asset Management", issue:160, gmp:19, gmpPct:11.88, listed:185.00, gainPct:15.63},
+  {name:"Mopshop Distribution", issue:138, gmp:1, gmpPct:0.72, listed:137.00, gainPct:-0.72},
+  {name:"Tempsens Instruments", issue:300, gmp:330, gmpPct:110.00, listed:634.00, gainPct:111.33},
+  {name:"Dhanwel Hybrid Seeds", issue:99, gmp:1, gmpPct:1.01, listed:99.00, gainPct:0.00},
+];
+
+const monthsData = { "Aug 2026": august2026 };
+let currentMonth = "Aug 2026";
+
+function tierFor(gmpPct){
+  if(gmpPct >= 20) return "best";
+  if(gmpPct >= 10) return "good";
+  if(gmpPct >= 0) return "average";
+  return "negative";
+}
+const tierLabel = {best:"Best", good:"Good", average:"Average", negative:"Weak"};
+
+function heldCheck(tier, gainPct){
+  if(tier === "best" || tier === "good"){
+    if(gainPct > 5) return {ok:"best", text:"Held"};
+    if(gainPct >= 0) return {ok:"average", text:"Mixed"};
+    return {ok:"negative", text:"Missed"};
+  }
+  if(tier === "average"){
+    if(gainPct > 10) return {ok:"best", text:"Beat it"};
+    if(gainPct >= -5) return {ok:"average", text:"Held"};
+    return {ok:"negative", text:"Missed"};
+  }
+  return gainPct <= 0 ? {ok:"best", text:"Held"} : {ok:"negative", text:"Missed"};
+}
+
+function renderStats(){
+  const rows = monthsData[currentMonth];
+  const withCheck = rows.map(r => ({...r, tier: tierFor(r.gmpPct), check: heldCheck(tierFor(r.gmpPct), r.gainPct)}));
+  const heldCount = withCheck.filter(r => r.check.ok === "best" || r.check.ok === "average").length;
+  const avgGain = (rows.reduce((s,r) => s + r.gainPct, 0) / rows.length).toFixed(1);
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-box"><div class="stat-num up">${heldCount}/${rows.length}</div><div class="stat-label">calls held or landed in range</div></div>
+    <div class="stat-box"><div class="stat-num">${avgGain >= 0 ? '+' : ''}${avgGain}%</div><div class="stat-label">average listing gain this month</div></div>
+  `;
+}
+
+function renderMonthTabs(){
+  const el = document.getElementById('monthTabs');
+  el.innerHTML = Object.keys(monthsData).map(m =>
+    `<button class="month-tab ${m === currentMonth ? 'active' : ''}" data-month="${m}">${m}</button>`
+  ).join('');
+  el.querySelectorAll('.month-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentMonth = tab.dataset.month;
+      renderStats();
+      renderMonthTabs();
+      renderList();
+    });
+  });
+}
+
+function renderList(){
+  const rows = monthsData[currentMonth];
+  const el = document.getElementById('historyList');
+  el.innerHTML = rows.map(r => {
+    const tier = tierFor(r.gmpPct);
+    const check = heldCheck(tier, r.gainPct);
+    return `
+    <div class="row-card">
+      <div class="row-top"><div class="row-name">${r.name}</div></div>
+      <div class="row-grid">
+        <div><span class="field-label">Issue price</span><span class="field-val">₹${r.issue}</span></div>
+        <div><span class="field-label">Pre-listing GMP</span><span class="field-val">₹${r.gmp} (${r.gmpPct >= 0 ? '+' : ''}${r.gmpPct.toFixed(1)}%)</span></div>
+        <div><span class="field-label">Listed at</span><span class="field-val ${r.gainPct > 0 ? 'pos' : (r.gainPct < 0 ? 'neg' : '')}">₹${r.listed.toFixed(2)} (${r.gainPct >= 0 ? '+' : ''}${r.gainPct.toFixed(1)}%)</span></div>
+      </div>
+      <div class="row-verdict">
+        <span class="pill ${tier}">${tierLabel[tier]}</span>
+        <span class="held-tag"><span class="pill ${check.ok}">${check.text}</span></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderStats();
+renderMonthTabs();
+renderList();
+</script>
+
+</body>
+</html>

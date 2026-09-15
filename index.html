@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Grey Ledger — IPO Tracker</title>
+<title>GMP Radar — IPO Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -43,7 +43,7 @@
   .dateline{font-size:12.5px; color:var(--muted);}
   .tagline{margin-top:6px; font-size:14.5px; color:var(--muted); max-width:56ch;}
 
-  .ticker-band{ border-bottom:1px solid var(--line); background:var(--panel); overflow:hidden; white-space:nowrap; position:relative; }
+  .ticker-band{ border-bottom:1px solid var(--line); background:var(--panel); overflow:hidden; white-space:nowrap; position:relative; margin:-34px 0 18px; }
   .ticker-band::before, .ticker-band::after{ content:""; position:absolute; top:0; bottom:0; width:24px; z-index:2; }
   .ticker-band::before{ left:0; background:linear-gradient(90deg, var(--panel), transparent); }
   .ticker-band::after{ right:0; background:linear-gradient(270deg, var(--panel), transparent); }
@@ -147,16 +147,12 @@
 <header class="masthead">
   <div class="wrap">
     <div class="masthead-inner">
-      <div class="brand">The Grey <em>Ledger</em></div>
+      <div class="brand">GMP <em>Radar</em></div>
       <div class="dateline" id="todayDate"></div>
     </div>
-    <div class="tagline">Every open, upcoming and pending-listing Indian IPO, GMP-first — each one comes with an automatic apply/hold read, no manual checklist needed.</div>
+    <div class="tagline">Every open, upcoming and pending-listing Indian IPO, GMP-first — each one comes with an automatic apply/hold read, no manual checklist needed. <a href="history.html">See our track record →</a></div>
   </div>
 </header>
-
-<div class="ticker-band">
-  <div class="ticker-track" id="tickerTrack"></div>
-</div>
 
 <main>
 
@@ -187,6 +183,9 @@
   </section>
 
   <section id="snapshot">
+    <div class="ticker-band">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
     <div class="wrap">
       <h2 class="section-title">Today's GMP movers</h2>
       <p class="section-sub">Grey-market pulse on names without firm structured data yet in this ledger — a snapshot from 11 Sep 2026, not a live feed.</p>
