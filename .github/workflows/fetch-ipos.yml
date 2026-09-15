@@ -2,8 +2,13 @@ name: Fetch IPO data
 
 on:
   schedule:
+    # 06:00 IST daily = 00:30 UTC. Runs *after* you've refreshed the token —
+    # see README for why the token has to be refreshed each morning.
     - cron: "30 0 * * *"
-  workflow_dispatch: {}
+    # 10:00 IST = 04:30 UTC. A second same-day run, timed to catch a freshly
+    # listed IPO's actual listing_price shortly after the market opens.
+    - cron: "30 4 * * *"
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
 
 permissions:
   contents: write
@@ -13,15 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Install dependencies
         run: pip install requests
+
       - name: Fetch IPO data from Upstox
         env:
           UPSTOX_ACCESS_TOKEN: ${{ secrets.UPSTOX_ACCESS_TOKEN }}
         run: python fetch_ipos.py
+
       - name: Commit updated ipos.json
         run: |
           git config user.name "ipo-ledger-bot"
