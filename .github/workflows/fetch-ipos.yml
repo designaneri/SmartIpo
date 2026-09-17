@@ -8,6 +8,7 @@ on:
     # 10:00 IST = 04:30 UTC. A second same-day run, timed to catch a freshly
     # listed IPO's actual listing_price shortly after the market opens.
     - cron: "30 4 * * *"
+    - cron: "5 1 * * *"
   workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
 
 permissions:
