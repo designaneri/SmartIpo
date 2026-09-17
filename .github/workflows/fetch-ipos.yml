@@ -2,14 +2,13 @@ name: Fetch IPO data
 
 on:
   schedule:
-    # 06:00 IST daily = 00:30 UTC. Runs *after* you've refreshed the token —
-    # see README for why the token has to be refreshed each morning.
-    - cron: "30 0 * * *"
-    # 10:00 IST = 04:30 UTC. A second same-day run, timed to catch a freshly
-    # listed IPO's actual listing_price shortly after the market opens.
+    # 12:00 AM IST = 18:30 UTC previous day
+    - cron: "30 18 * * *"
+
+    # 10:00 AM IST = 04:30 UTC
     - cron: "30 4 * * *"
-    - cron: "5 1 * * *"
-  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -17,26 +16,32 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests
+        run: python -m pip install requests
 
       - name: Fetch IPO data from Upstox
         env:
-          UPSTOX_ACCESS_TOKEN: ${{ secrets.UPSTOX_ACCESS_TOKEN }}
+          UPSTOX_EXTENDED_TOKEN: ${{ secrets.UPSTOX_EXTENDED_TOKEN }}
         run: python fetch_ipos.py
 
       - name: Commit updated ipos.json
         run: |
           git config user.name "ipo-ledger-bot"
           git config user.email "actions@users.noreply.github.com"
+
           git add ipos.json
+
           git diff --cached --quiet && echo "No changes" && exit 0
+
           git commit -m "Update IPO data ($(date -u +%Y-%m-%dT%H:%MZ))"
           git push
