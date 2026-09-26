@@ -3067,9 +3067,9 @@
       "website": "https://www.kfintech.com/",
       "registrar": "KFin"
     },
-    "listingExchange": null,
-    "symbol": null,
-    "isin": null,
+    "listingExchange": "NSE",
+    "symbol": "SRIT",
+    "isin": "INE307K01028",
     "industry": "IT - Software",
     "faceValue": 5.0,
     "minimumQuantity": 115,
