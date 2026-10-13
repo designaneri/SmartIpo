@@ -3767,14 +3767,14 @@
       "website": "https://www.kfintech.com/",
       "registrar": "K Fintech"
     },
-    "listingExchange": null,
-    "symbol": null,
-    "isin": null,
+    "listingExchange": "BSE",
+    "symbol": "FUSIONCX",
+    "isin": "INE0N2201019",
     "industry": null,
     "faceValue": 1.0,
     "minimumQuantity": 51,
     "cutOffPrice": 289.0,
-    "rhpUrl": null,
+    "rhpUrl": "https://www.fusioncx.com/wp-content/uploads/rhp/Fusion-CX-Limited-Red-Herring-Prospectus.pdf",
     "drhpUrl": null,
     "upstoxId": "fusion-cx-limited-ipo",
     "gmp": null
