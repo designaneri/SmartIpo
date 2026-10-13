@@ -3907,9 +3907,9 @@
       "website": "https://www.kfintech.com/",
       "registrar": "K FINTECH"
     },
-    "listingExchange": null,
-    "symbol": null,
-    "isin": null,
+    "listingExchange": "BSE,NSE",
+    "symbol": "TONBO",
+    "isin": "INE0LDG01026",
     "industry": null,
     "faceValue": 2.0,
     "minimumQuantity": 21,
