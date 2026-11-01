@@ -4537,9 +4537,9 @@
       "website": "https://cameoindia.com/",
       "registrar": "CAMEO"
     },
-    "listingExchange": null,
-    "symbol": null,
-    "isin": null,
+    "listingExchange": "NSE",
+    "symbol": "VPFL",
+    "isin": "INE2RWX01016",
     "industry": "Packaging",
     "faceValue": 10.0,
     "minimumQuantity": 2400,
