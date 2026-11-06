@@ -4352,8 +4352,8 @@
     "subs": "173.78x",
     "issueSize": "₹35 Cr",
     "minAmount": "₹1,44,000",
-    "listingPrice": null,
-    "listingGainPct": null,
+    "listingPrice": 160.0,
+    "listingGainPct": 33.33,
     "registrar": {
       "name": "KFin Technologies Limited",
       "email": "hgs.ipo@kfintech.com",
@@ -4387,8 +4387,8 @@
     "subs": "23.61x",
     "issueSize": "₹56 Cr",
     "minAmount": "₹1,20,000",
-    "listingPrice": null,
-    "listingGainPct": null,
+    "listingPrice": 238.5,
+    "listingGainPct": 19.25,
     "registrar": {
       "name": "Maashitla Securities Pvt. Limited",
       "email": "contact@maashitla.com",
@@ -4422,8 +4422,8 @@
     "subs": "534.65x",
     "issueSize": "₹58 Cr",
     "minAmount": "₹1,26,400",
-    "listingPrice": null,
-    "listingGainPct": null,
+    "listingPrice": 300.2,
+    "listingGainPct": 90.0,
     "registrar": {
       "name": "KFIN TECHNOLOGIES LIMITED",
       "email": "maxwell.ipo@kfintech.com",
@@ -4457,8 +4457,8 @@
     "subs": "4.22x",
     "issueSize": "₹53 Cr",
     "minAmount": "₹1,26,000",
-    "listingPrice": null,
-    "listingGainPct": null,
+    "listingPrice": 106.0,
+    "listingGainPct": 0.95,
     "registrar": {
       "name": "MUFG Intime India PrivateLimited",
       "email": "vectras.smeipo@in.mpms.mufg.com",
