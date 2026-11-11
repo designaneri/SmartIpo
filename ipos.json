@@ -4527,8 +4527,8 @@
     "subs": "12.72x",
     "issueSize": "₹23 Cr",
     "minAmount": "₹1,32,000",
-    "listingPrice": null,
-    "listingGainPct": null,
+    "listingPrice": 52.8,
+    "listingGainPct": -20.0,
     "registrar": {
       "name": "BIGSHARE SERVICES PRIVATE LIMITED",
       "email": "ipo@bigshareonline.com",
